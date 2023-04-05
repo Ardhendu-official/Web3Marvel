@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  origin:
+    build: .
+    env_file: .env
+    ports:
+    - "2352:2352/tcp"
+    # environment:
+    command: bash -c 'node app.js'
