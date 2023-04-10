@@ -10,7 +10,7 @@ const { randomBytes } = require('crypto');
 
 
 router.get("/", async (req, res) => {
-    res.send({ data: 'polygon' });
+    res.send({ data: 'solana' });
 });
 
 router.post("/account", async (req, res) => {

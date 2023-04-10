@@ -1,8 +1,10 @@
 const Web3 = require('web3');
 const { Wallet, providers, ethers } = require("ethers");
-// const provider = new providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545");
 const BscScanApi = require("bscscan-api").init("IWFZ9GJ1HMINPGD65Q2GZDDPTJNHJJFEUY");
 const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed.binance.org/'));
+// const Tx = require('ethereumjs-tx').Transaction;
+// const we3 = require('web3');
+// const w3 = new we3('https://bsc-dataseed.binance.org/');
 
 const express = require('express');
 const axios = require("axios")
@@ -146,26 +148,45 @@ router.post("/wallet/send", async (req, res) => {
 })
 
 router.post("/token/send", async (req, res) => {
-    const privatekey = req.body.privateKey;
+    const privateKey = req.body.privateKey; // Sender's private key
+    const tokenContractAddress  = req.body.c_address; // Token contract address
+    const fromAddress = req.body.from_account; // Sender's address
+    const toAddress = req.body.to_account; // Receiver's address
+    const amount = toPlainString(req.body.amount); // Amount to send (1 token)
 
-    const provi = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
-
-    const contractAddress = req.body.c_address;
-
-    var abi = await axios.get(`https://api.bscscan.com/api?module=contract&action=getabi&address=${contractAddress}&apikey=EFK4RG5QBTDKPUW8KN2GCFB2TC8D3XJ968`)
-    console.log(typeof JSON.parse(abi.data.result));
-
-    const tokenContract = new ethers.Contract(contractAddress, JSON.parse(abi.data.result), provi);
-
-    const signer = new ethers.Wallet(privatekey, provi);
-
-    const to_account= req.body.to_account                                    //reciver
-    const from_account = req.body.from_account                              //sender
-    const amountToSend = ethers.utils.parseUnits(req.body.amount, '18')
-
-    const transaction = await tokenContract.connect(signer).transfer(to_account, amountToSend);
-    const tx = await transaction.wait();
-    console.log(tx);
+    const txObject = {
+        from: fromAddress,
+        to: tokenContractAddress,
+        gasPrice: web3.utils.toHex(await web3.eth.getGasPrice()), // Use current gas price
+        gasLimit: web3.utils.toHex(100000), // Gas limit for a token transfer
+        nonce: web3.utils.toHex(await web3.eth.getTransactionCount(fromAddress)), // Use the sender's nonce
+        data: web3.eth.abi.encodeFunctionCall({
+          name: 'transfer',
+          type: 'function',
+          inputs: [{
+            type: 'address',
+            name: 'to'
+          }, {
+            type: 'uint256',
+            name: 'value'
+          }]
+        }, [toAddress, amount])
+      };
+      
+      const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
+      
+      try {
+        const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        console.log(`Transaction hash: ${result.transactionHash}`);
+        res.status(200)
+        res.set('content-type', 'application/json');
+        res.send(result.transactionHash)
+      } catch (error) {
+        console.error(`Error sending transaction: ${error}`);
+            res.status(400)
+            res.set('content-type', 'application/json');
+            res.send(error)
+      }
 
     function toPlainString(num) {
         return (''+ +num).replace(/(-?)(\d*)\.?(\d*)e([+-]\d+)/,

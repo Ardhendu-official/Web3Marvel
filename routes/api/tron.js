@@ -275,9 +275,40 @@ router.post("/token/send", async (req, res) => {
     tronWebToken.setHeader({ "TRON-PRO-API-KEY": API_Key });
     tronWebToken.setHeader({ "Authorization": `Bearer ${tocken}` });
 
+    const contractInstance = await tronWebToken.contract().at(tokenAddress);
+    const contractAbi = contractInstance.abi;
+    // console.log(typeof contractAbi);
+    // console.log(contractAbi);
+
+    const trc20Contract = tronWebToken.contract(contractAbi, tokenAddress);
+
+    trc20Contract.decimals().call().then(decimals => {
+        const tokenAmount = amount * Math.pow(10, decimals);
+      
+        // Transfer tokens
+        trc20Contract.transfer(toAddress, tokenAmount).send({
+          from: fromAddress
+        }).then(tx => {
+            console.log(tx);
+            res.status(200)
+            res.set('content-type', 'application/json');
+            res.send(tx)
+        }).catch(err => {
+            console.log(err);
+            res.status(400)
+            res.set('content-type', 'application/json');
+            res.send(err)
+        });
+      });
+
     // const contract = await tronWebToken.contract().at(tokenAddress);
     // const decimals = await contract.decimals().call();
     // const amountWithDecimals = amount * 10 ** decimals;
+    // console.log(typeof contract);
+    // console.log( JSON.parse(contract));
+    // console.log(decimals);
+    // console.log(amountWithDecimals);
+
 
     // console.log(contract);
     // console.log(JSON.parse(decimals));  
@@ -300,15 +331,15 @@ router.post("/token/send", async (req, res) => {
     // console.log(receipt);
     // res.send(JSON.stringify.receipt)
 
-    tronWebToken.contract().at(tokenAddress).then(contract => {
-        contract.transfer(toAddress, amount).send().then(result => {
-            console.log(result);
-        }).catch(error => {
-            console.error(error);
-        });
-    }).catch(error => {
-        console.error(error);
-    });
+    // tronWebToken.contract().at(tokenAddress).then(contract => {
+    //     contract.transfer(toAddress, amount).send().then(result => {
+    //         console.log(result);
+    //     }).catch(error => {
+    //         console.error(error);
+    //     });
+    // }).catch(error => {
+    //     console.error(error);
+    // });
 
 
 
