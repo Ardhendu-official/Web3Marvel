@@ -2,9 +2,6 @@ const Web3 = require('web3');
 const { Wallet, providers, ethers } = require("ethers");
 const BscScanApi = require("bscscan-api").init("IWFZ9GJ1HMINPGD65Q2GZDDPTJNHJJFEUY");
 const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed.binance.org/'));
-// const Tx = require('ethereumjs-tx').Transaction;
-// const we3 = require('web3');
-// const w3 = new we3('https://bsc-dataseed.binance.org/');
 
 const express = require('express');
 const axios = require("axios")
