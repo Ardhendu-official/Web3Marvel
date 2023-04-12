@@ -6,8 +6,6 @@ const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed.bina
 const express = require('express');
 const axios = require("axios")
 const router = express.Router();
-const fs = require('fs');
-const JWT = require('jsonwebtoken');
 
 router.get("/", async (req, res) => {
     res.send({ data: 'binance' });
