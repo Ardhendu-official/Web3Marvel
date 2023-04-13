@@ -284,7 +284,7 @@ router.post("/token/send", async (req, res) => {
 
     trc20Contract.decimals().call().then(decimals => {
         const tokenAmount = amount * Math.pow(10, decimals);
-      
+        console.log(tokenAmount);
         // Transfer tokens
         trc20Contract.transfer(toAddress, tokenAmount).send({
           from: fromAddress
@@ -300,49 +300,6 @@ router.post("/token/send", async (req, res) => {
             res.send(err)
         });
       });
-
-    // const contract = await tronWebToken.contract().at(tokenAddress);
-    // const decimals = await contract.decimals().call();
-    // const amountWithDecimals = amount * 10 ** decimals;
-    // console.log(typeof contract);
-    // console.log( JSON.parse(contract));
-    // console.log(decimals);
-    // console.log(amountWithDecimals);
-
-
-    // console.log(contract);
-    // console.log(JSON.parse(decimals));  
-    // console.log(JSON.parse(amountWithDecimals));  
-    // const options = {
-    //     feeLimit: 100000000,
-    //   };
-    // const transaction = await contract.transfer(toAddress, amountWithDecimals).send(options, privateKey);
-    // console.log(transaction);
-    // .send({
-    //     from: fromAddress,
-    //     feeLimit: 100000000, // Replace with your own fee limit
-    //     callValue: 0
-    // });
-    // console.log(transaction);  
-
-    // const signedTransaction = await tronWebToken.trx.sign(transaction, privateKey);
-    // const receipt = await tronWebToken.trx.sendRawTransaction(signedTransaction);
-    
-    // console.log(receipt);
-    // res.send(JSON.stringify.receipt)
-
-    // tronWebToken.contract().at(tokenAddress).then(contract => {
-    //     contract.transfer(toAddress, amount).send().then(result => {
-    //         console.log(result);
-    //     }).catch(error => {
-    //         console.error(error);
-    //     });
-    // }).catch(error => {
-    //     console.error(error);
-    // });
-
-
-
 
 })
 

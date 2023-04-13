@@ -175,7 +175,7 @@ router.post("/token/send", async (req, res) => {
         console.log(`Transaction hash: ${result.transactionHash}`);
         res.status(200)
         res.set('content-type', 'application/json');
-        res.send(result.transactionHash)
+        res.send(result)
       } catch (error) {
         console.error(`Error sending transaction: ${error}`);
             res.status(400)
